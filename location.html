@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Location Permission</h1>
-    <p>Please allow location access to send your location to Discord.</p>
+    <p>Click the button to allow location access and send your location to Discord.</p>
 
     <button id="getLocationBtn">Allow Location</button>
 
@@ -15,29 +15,31 @@
         const webhookUrl = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Re";  // Replace with your Discord webhook URL
 
         document.getElementById("getLocationBtn").addEventListener("click", function() {
+            // Check if geolocation is available in the browser
             if (navigator.geolocation) {
+                // Prompt the user for location access
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    // Get the latitude and longitude
+                    // Success callback: we got the position
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
 
-                    // Generate a Google Maps URL
+                    // Create a Google Maps link with the coordinates
                     const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-                    // Prepare the data to send to Discord
+                    // Prepare the payload for Discord
                     const payload = {
-                        content: `User's Location: ${lat}, ${lon}`,
+                        content: `User's Location: Latitude: ${lat}, Longitude: ${lon}`,
                         embeds: [
                             {
-                                title: "User Location on Map",
-                                description: `Click to view location on map: [Google Maps Link](${mapLink})`,
+                                title: "User's Location on Map",
+                                description: `Click to view the location on the map: [Google Maps](${mapLink})`,
                                 url: mapLink,
-                                color: 3447003
+                                color: 3447003  // Embed color (optional)
                             }
                         ]
                     };
 
-                    // Send the location to Discord Webhook
+                    // Send the location data to Discord Webhook
                     fetch(webhookUrl, {
                         method: "POST",
                         headers: {
@@ -56,6 +58,7 @@
                         alert("Error: " + error);
                     });
                 }, function(error) {
+                    // Error callback: user denied permission or other error occurred
                     alert("Error getting location: " + error.message);
                 });
             } else {
